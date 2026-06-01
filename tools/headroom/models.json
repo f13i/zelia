@@ -1,0 +1,15 @@
+{
+  "anthropic": {
+    "context_limits": {
+      "claude-opus-4-8": 1000000,
+      "claude-sonnet-4-6": 1000000,
+      "claude-haiku-4-5-20251001": 200000
+    }
+  },
+  "openai": {
+    "context_limits": {
+      "gpt-4o": 128000,
+      "gpt-4o-mini": 128000
+    }
+  }
+}
