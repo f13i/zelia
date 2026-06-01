@@ -107,6 +107,8 @@ CONTEXT.md          - global company description and context
 
 agents/             - AI employees with defined routines and skill assignments
 
+tools/              - operational tooling the agents/operators run (e.g. headroom)
+
 domain folders:
 brand/              - brand assets, guidelines, voice
 content/            - all content by channel
@@ -138,6 +140,7 @@ Skills are detailed, self-improving instruction files. They live in `.claude/ski
 | `legal` | `create-contract`, `review-contract` | Contract drafting and review |
 | `ops` | `zero-inbox` | Inbox triage |
 | `writing` | `email-writer` | Email drafting |
+| `tools` | `headroom` | Compress agent context to cut LLM token spend 60–95% |
 | `sylph` | `sylph-setup`, `sylph-setup-agent`, `sylph-setup-skill`, `sylph-create-skill` | Initial setup, agent configuration, per-domain setup, skill creation |
 
 ## Agents
@@ -154,6 +157,44 @@ Agents are AI employees that run on schedules. Each has a role definition and a 
 | **Head of Sales** | Pipeline management, outbound campaigns | Weekly |
 | **Executive Assistant** | Admin, HR, finance, accounting ops | Daily |
 | **Brand Designer** | Visual and motion assets | On-demand |
+
+## Tools
+
+Operational tooling the agents and operators run lives in `tools/`. These aren't
+skills — they're real programs you install and run from the command line.
+
+### Headroom — cut your token bill
+
+[Headroom](https://github.com/chopratejas/headroom) (Apache 2.0) is a
+context-compression layer for AI agents. It compresses everything an agent reads
+— tool outputs, logs, RAG chunks, files, conversation history — *before* it
+reaches the LLM, for 60–95% fewer tokens with the same answers. Compression is
+reversible: originals stay on your machine and the model retrieves them on demand.
+
+This matters here because Sylph agents constantly read bulky context (meeting
+transcripts, CRM dumps, logs, MCP/JSON tool outputs). Headroom strips the
+redundant tokens before you pay for them. It runs **locally** — no data leaves
+your machine, and we ship it with telemetry off.
+
+We run it as a lean integration in [`tools/headroom/`](tools/headroom/): we
+install the published `headroom-ai` package and keep only our config + wrappers
+in-repo (so we're not vendoring a 118 MB project).
+
+**Use it:**
+
+```bash
+cd tools/headroom
+./setup.sh                 # once: installs headroom-ai[all] + our config
+./wrap.sh claude           # wrap a coding agent (claude|codex|cursor|aider|copilot|gemini)
+./proxy.sh                 # OR a drop-in proxy on :8787 for any OpenAI/Anthropic client
+headroom stats             # see tokens/$ saved
+```
+
+Inside the repo, any agent can be told *"run this through Headroom"* and will
+follow the [`/headroom`](.claude/skills/headroom/SKILL.md) skill. Our defaults
+(mode, port, $50/day budget, telemetry) live in `tools/headroom/headroom.env`;
+the upstream version we pin to and how to sync it live in
+`tools/headroom/UPSTREAM.md`. Requires **Python 3.10+**.
 
 ## Customization guide
 
