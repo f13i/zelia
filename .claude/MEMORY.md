@@ -12,3 +12,5 @@ Claude updates this file when it learns something non-obvious:
 
 Format: - [Short title](memory/filename.md) - one-line description
 -->
+
+- [Headroom fork](memory/headroom-fork.md) - we run Headroom (token compression) as a lean integration in `tools/headroom/`, not a vendored source copy.

@@ -176,6 +176,7 @@ Skills follow the [Agent Skills](https://agentskills.io) open standard. Each has
 | crm | sales | `.claude/skills/crm/SKILL.md` |
 | customer-report | sales | `.claude/skills/customer-report/SKILL.md` |
 | email-writer | writing | `.claude/skills/email-writer/SKILL.md` |
+| headroom | tools | `.claude/skills/headroom/SKILL.md` |
 | sylph-create-skill | sylph | `.claude/skills/sylph-create-skill/SKILL.md` |
 | sylph-setup | sylph | `.claude/skills/sylph-setup/SKILL.md` |
 | sylph-setup-agent | sylph | `.claude/skills/sylph-setup-agent/SKILL.md` |
