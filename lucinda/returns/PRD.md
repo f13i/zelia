@@ -97,6 +97,17 @@ Order emails rarely state a return-by date, so Lucinda derives it:
 
 ## 9. Workflows (Modes D1–D4)
 
+### D0 — Auto-reconcile labels (silent, every run)
+Runs first on every invocation **and** on the scheduled check, without asking.
+Scans every `Returns/*` thread and moves each to the correct single status label
+from context: a return request **sent from `fmanjiyani@gmail.com`** advances
+`To-Return → In-Progress`; a refund/credit confirmation → `Done`; a sent
+renegotiation ask → `Renegotiating`. Guardrail enforced here: a send from the
+**wrong address** (`me@f13i.com`) does **not** advance the label — it's flagged
+at-risk, because the merchant can't match the order. A passed window with nothing
+sent is surfaced, not silently relabeled. One status label per thread; terminal
+states only on a real confirmation or Farhan's keep decision.
+
 ### D1 — Purchase sweep (find & log)
 Trigger: "track my returns" / "find my purchases" / scheduled weekly / backfill
 ("go through all my emails").

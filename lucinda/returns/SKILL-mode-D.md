@@ -30,6 +30,10 @@ Lucinda **delegates this to the `lucinda-returns` subagent** (Agent tool,
 relays its digest/questions to Farhan and passes his replies back.
 
 The returns agent, in one line each:
+0. **Auto-reconcile** — on every run (and the scheduled check) it re-reads all
+   `Returns/*` threads and moves labels from context (sent-from-Gmail return →
+   In-Progress, refund → Done, etc.) silently, no asking. A send from the wrong
+   address (`me@f13i.com`) does NOT advance the label — it's flagged at-risk.
 1. **Sweep** Farhan's email for purchases (Amazon + 3rd party), log each under a
    `Returns/*` Gmail label, and put each return deadline on the calendar (all-day,
    non-blocking). No database — labels + calendar are the record.

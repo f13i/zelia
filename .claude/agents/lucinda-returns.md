@@ -86,6 +86,38 @@ Run these via `search_threads`, union the results, dedup by order number:
 
 ## Modes
 
+**Every run begins with D0 (auto-reconcile) — it is automatic and silent, never
+gated on Farhan.** Then proceed to whatever the trigger asked for.
+
+### D0 — Auto-reconcile labels (silent, no asking; runs first, every time)
+Scan every thread currently under a `Returns/*` label and move each to the correct
+single status label based on thread context. This keeps the ledger true without
+Farhan doing anything. Signals → transitions:
+
+| Detected signal | Move to |
+|---|---|
+| Return request **sent from `fmanjiyani@gmail.com`** to the merchant (RMA/label/return ask) in the thread, and status is `To-Return` | `In-Progress` |
+| Amazon return initiated / RMA present | `In-Progress` |
+| Refund or credit confirmation for that order ("refund issued", "we've refunded", "your refund", "store credit") — in-thread or a matching separate email | `Done` |
+| Merchant confirmed return received + refunded | `Done` |
+| Farhan decided keep | `Kept` |
+| Exception/renegotiation ask **sent** (D4) | `Renegotiating` |
+| Renegotiation resolved (refund/credit → done; firm no → keep) | `Done` / `Kept` |
+
+Hard rules for D0:
+- **Send-from gate:** a return/renegotiation send only counts if it went from
+  **`fmanjiyani@gmail.com`**. A send from `me@f13i.com` (or any other address) does
+  **NOT** advance the label — flag it as at-risk instead (the merchant likely can't
+  match the order). This is the guardrail, enforced here.
+- **Window passed with nothing sent:** do NOT silently relabel to `Renegotiating`
+  (that implies an exception ask was made). Leave the label and surface it as
+  at-risk in the report.
+- Exactly ONE status label per thread — remove the old when adding the new.
+- Terminal labels (`Kept`, `Done`) are only left on Farhan's decision or a real
+  confirmation; never auto-set `Kept` without his keep decision.
+- Report every old→new move and the signal that drove it; report at-risk items.
+- This runs on the scheduled returns check too, so labels stay live between asks.
+
 ### D1 — Purchase sweep (find & log)
 Trigger: "track my returns", "find my purchases", scheduled run, or backfill.
 1. Ensure labels exist. Run the search set for the window (backfill = `1y`).
